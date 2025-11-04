@@ -70,14 +70,6 @@ public class RecruiterController {
         }
     }
 
-//    @GetMapping("/applications/{recruiterId}/{jobId}")
-//    public ResponseEntity<ApiResponse> getApplications(@PathVariable Long recruiterId, @PathVariable Long jobId) {
-//        try {
-//            return ResponseEntity.ok(ApiResponse.success(recruiterService.getApplicationsForJob(recruiterId, jobId)));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
-//        }
-//    }
 @GetMapping("/applications/{recruiterId}/{jobId}")
 public ResponseEntity<ApiResponse> getApplications(@PathVariable Long recruiterId, @PathVariable Long jobId) {
     try {

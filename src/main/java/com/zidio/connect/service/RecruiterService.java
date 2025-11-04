@@ -93,8 +93,6 @@ public class RecruiterService {
         return jobPostingRepository.findByRecruiterId(recruiterId);
     }
 
-    // ✅ UPDATED METHOD - Returns applications with complete student details
-    // ✅ Now uses correct field names: resumeUrl, education, college
     public List<Map<String, Object>> getApplicationsForJob(Long recruiterId, Long jobId) {
         JobPosting job = jobPostingRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
@@ -105,18 +103,18 @@ public class RecruiterService {
 
         List<Application> applications = applicationRepository.findByJobId(jobId);
 
-        // Map each application to include complete student details
+
         return applications.stream()
                 .map(app -> {
                     Map<String, Object> details = new HashMap<>();
 
-                    // Application details
+
                     details.put("id", app.getId());
                     details.put("coverLetter", app.getCoverLetter());
                     details.put("status", app.getStatus().toString());
                     details.put("appliedAt", app.getAppliedAt());
 
-                    // Get student profile and user details
+
                     try {
                         StudentProfile student = studentProfileRepository.findByUserId(app.getStudentId())
                                 .orElse(null);
@@ -127,21 +125,21 @@ public class RecruiterService {
 
                             Map<String, Object> studentInfo = new HashMap<>();
 
-                            // User basic info
+
                             if (user != null) {
                                 studentInfo.put("id", user.getId());
                                 studentInfo.put("fullName", user.getFullName());
                                 studentInfo.put("email", user.getEmail());
                             }
 
-                            // Student profile details (matching your entity fields)
+
                             studentInfo.put("phone", student.getPhone());
-                            studentInfo.put("education", student.getEducation());  // ✅ Changed from degree
-                            studentInfo.put("college", student.getCollege());      // ✅ Changed from university
+                            studentInfo.put("education", student.getEducation());
+                            studentInfo.put("college", student.getCollege());
                             studentInfo.put("graduationYear", student.getGraduationYear());
                             studentInfo.put("skills", student.getSkills());
                             studentInfo.put("bio", student.getBio());
-                            studentInfo.put("resumeUrl", student.getResumeUrl());  // ✅ Changed from resumePath
+                            studentInfo.put("resumeUrl", student.getResumeUrl());
 
                             details.put("student", studentInfo);
                         }
@@ -169,113 +167,3 @@ public class RecruiterService {
         return applicationRepository.save(application);
     }
 }
-//package com.zidio.connect.service;
-//
-//import com.zidio.connect.entity.Application;
-//import com.zidio.connect.entity.RecruiterProfile;
-//import com.zidio.connect.entity.JobPosting;
-//import com.zidio.connect.repository.ApplicationRepository;
-//import com.zidio.connect.repository.JobPostingRepository;
-//import com.zidio.connect.repository.RecruiterProfileRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//
-//@Service
-//public class RecruiterService {
-//
-//    @Autowired
-//    private RecruiterProfileRepository recruiterProfileRepository;
-//
-//    @Autowired
-//    private JobPostingRepository jobPostingRepository;
-//
-//    @Autowired
-//    private ApplicationRepository applicationRepository;
-//
-//    public RecruiterProfile getProfile(Long userId) {
-//        return recruiterProfileRepository.findByUserId(userId)
-//                .orElseThrow(() -> new RuntimeException("Profile not found"));
-//    }
-//
-//    public RecruiterProfile updateProfile(Long userId, RecruiterProfile profileData) {
-//        RecruiterProfile profile = recruiterProfileRepository.findByUserId(userId)
-//                .orElseThrow(() -> new RuntimeException("Profile not found"));
-//
-//        profile.setCompanyName(profileData.getCompanyName());
-//        profile.setCompanyWebsite(profileData.getCompanyWebsite());
-//        profile.setPhone(profileData.getPhone());
-//        profile.setCompanyDescription(profileData.getCompanyDescription());
-//        profile.setLocation(profileData.getLocation());
-//        profile.setIndustry(profileData.getIndustry());
-//
-//        return recruiterProfileRepository.save(profile);
-//    }
-//
-//    public JobPosting createJobPosting(Long recruiterId, JobPosting jobPosting) {
-//        jobPosting.setRecruiterId(recruiterId);
-//        return jobPostingRepository.save(jobPosting);
-//    }
-//
-//    public JobPosting updateJobPosting(Long recruiterId, Long jobId, JobPosting jobData) {
-//        JobPosting job = jobPostingRepository.findById(jobId)
-//                .orElseThrow(() -> new RuntimeException("Job not found"));
-//
-//        if (!job.getRecruiterId().equals(recruiterId)) {
-//            throw new RuntimeException("Unauthorized");
-//        }
-//
-//        job.setTitle(jobData.getTitle());
-//        job.setDescription(jobData.getDescription());
-//        job.setRequirements(jobData.getRequirements());
-//        job.setLocation(jobData.getLocation());
-//        job.setSalary(jobData.getSalary());
-//        job.setDuration(jobData.getDuration());
-//        job.setApplicationDeadline(jobData.getApplicationDeadline());
-//        job.setStatus(jobData.getStatus());
-//
-//        return jobPostingRepository.save(job);
-//    }
-//
-//    public void deleteJobPosting(Long recruiterId, Long jobId) {
-//        JobPosting job = jobPostingRepository.findById(jobId)
-//                .orElseThrow(() -> new RuntimeException("Job not found"));
-//
-//        if (!job.getRecruiterId().equals(recruiterId)) {
-//            throw new RuntimeException("Unauthorized");
-//        }
-//
-//        jobPostingRepository.delete(job);
-//    }
-//
-//    public List<JobPosting> getMyJobPostings(Long recruiterId) {
-//        return jobPostingRepository.findByRecruiterId(recruiterId);
-//    }
-//
-//    public List<Application> getApplicationsForJob(Long recruiterId, Long jobId) {
-//        JobPosting job = jobPostingRepository.findById(jobId)
-//                .orElseThrow(() -> new RuntimeException("Job not found"));
-//
-//        if (!job.getRecruiterId().equals(recruiterId)) {
-//            throw new RuntimeException("Unauthorized");
-//        }
-//
-//        return applicationRepository.findByJobId(jobId);
-//    }
-//
-//    public Application updateApplicationStatus(Long recruiterId, Long applicationId, String status) {
-//        Application application = applicationRepository.findById(applicationId)
-//                .orElseThrow(() -> new RuntimeException("Application not found"));
-//
-//        JobPosting job = jobPostingRepository.findById(application.getJobId())
-//                .orElseThrow(() -> new RuntimeException("Job not found"));
-//
-//        if (!job.getRecruiterId().equals(recruiterId)) {
-//            throw new RuntimeException("Unauthorized");
-//        }
-//
-//        application.setStatus(Application.ApplicationStatus.valueOf(status.toUpperCase()));
-//        return applicationRepository.save(application);
-//    }
-//}
