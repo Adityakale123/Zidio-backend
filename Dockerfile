@@ -1,23 +1,13 @@
-# Stage 1: Build WAR using Maven
+# Stage 1: Build JAR using Maven
 FROM maven:3.8-openjdk-17 AS builder
-
 WORKDIR /app
-
 COPY pom.xml .
 COPY src ./src
+RUN mvn clean package -DskipTests
 
-RUN mvn clean package
-
-# Stage 2: Deploy to Tomcat
-FROM tomcat:10.1-jdk17
-
-RUN rm -rf /usr/local/tomcat/webapps/*
-
-COPY --from=builder /app/target/ROOT.war /usr/local/tomcat/webapps/ROOT.war
-
-# Configure for Render's port
+# Stage 2: Run with Java
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=builder /app/target/connect-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 10000
-
-RUN sed -i 's/port="8080"/port="10000"/' /usr/local/tomcat/conf/server.xml
-
-CMD ["catalina.sh", "run"]
+ENTRYPOINT ["java", "-jar", "-Dserver.port=10000", "app.jar"]
